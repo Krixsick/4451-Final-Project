@@ -153,3 +153,57 @@ availability. Never use the synthetic fixtures as study data.
 - [Player and team game logs](https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguegamelog.md)
 - [Advanced team statistics and date filters](https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguedashteamstats.md)
 - [Player birthdates](https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/commonplayerinfo.md)
+
+## Train the first points model
+
+After preparing the training and validation exports, run:
+
+```sh
+uv run python -m scripts.train_model
+```
+
+Read `scripts/train_model.py` starting at `train_and_evaluate()`. It selects the
+18 `FEATURE_COLUMNS`, fits one shared gradient-boosted tree regressor, and
+predicts points for the later validation games. Names and IDs remain in the
+prediction report but never enter the model. There is no random train/test
+split, and automatic early stopping is disabled to avoid an internal random
+validation split. The fixed settings are a starting experiment, not tuned values.
+Predictions are clipped to a minimum of zero.
+
+The default inputs are `data/clean/train_2020_2025.csv` and
+`data/clean/validation_2025_2026.csv`. Missing files cause an error: the script
+does not silently substitute partial data or download NBA records.
+
+To try the code with the already prepared earlier seasons:
+
+```sh
+uv run python -m scripts.train_model \
+  --train data/clean/seasons/features_2020-21.csv \
+  --validation data/clean/seasons/features_2021-22.csv \
+  --output data/models/early_experiment
+```
+
+That is an exploratory 2020-21 -> 2021-22 experiment, not the planned five-season
+training / 2025-26 validation result. All training dates must precede every
+validation date, and duplicate/overlapping player-game records are rejected.
+
+By default, `data/models/model_a` receives:
+
+- `model.pkl`: fitted model, ordered feature names, prediction floor, and scikit-learn version.
+- `metrics.csv`: MAE and RMSE for the model, season-to-date average, and last-ten-game average.
+- `validation_predictions.csv`: those three predictions and actual points for each player-game, with names.
+- `report.json`: source paths, season/date coverage, row counts, model settings, and scores.
+
+Lower MAE/RMSE is better. All three methods use exactly the same validation rows.
+Features update using completed earlier games during validation, while model
+parameters stay fixed. This simulates successive pregame predictions, not a
+forecast of every game made before the season starts. Scores describe recorded
+appearances with sufficient history; they do not evaluate DNP predictions.
+
+Rerunning replaces results in the chosen output folder. Use a different
+`--output` folder for each feature experiment. Only load pickle models you trust
+and use the recorded scikit-learn environment when reloading. Training runs
+outside FastAPI; the saved model can later be loaded for serving. Keep 2026-27
+out of feature/model selection and evaluate it once choices are frozen.
+
+Model reference: [scikit-learn HistGradientBoostingRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html).
