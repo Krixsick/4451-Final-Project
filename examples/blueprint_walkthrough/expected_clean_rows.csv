@@ -1,0 +1,5 @@
+season,game_id,game_date,player_id,player_name,team_id,team_abbreviation,opponent_id,points_last_5,points_last_10,points_season_avg,minutes_last_5,minutes_last_10,fga_last_10,fg3a_last_10,fta_last_10,opponent_defensive_rating,team_pace,opponent_pace,is_home,team_rest_days,opponent_rest_days,team_back_to_back,opponent_back_to_back,age,games_played_before,target_points
+2024-25,0022400054,2024-12-03,1630567,Scottie Barnes,1610612761,TOR,1610612754,22.6,20.7,20.7,35.2,33.7,16.9,5.5,5.9,116.9,99.39,100.86,1,1.0,1.0,0.0,0.0,23.340657234577026,10,35
+2024-25,0022400328,2024-12-05,1630567,Scottie Barnes,1610612761,TOR,1610612760,26.0,23.3,22.0,35.6,34.7,17.5,6.0,6.3,103.9,99.76,100.17,1,1.0,1.0,0.0,0.0,23.346133048591003,11,12
+2024-25,0022400344,2024-12-07,1630567,Scottie Barnes,1610612761,TOR,1610612742,22.2,21.8,21.166666666666668,34.4,34.2,17.7,6.5,5.0,109.8,99.96,100.91,1,1.0,1.0,0.0,0.0,23.35160886260498,12,19
+2024-25,0022400359,2024-12-09,1630567,Scottie Barnes,1610612761,TOR,1610612752,22.6,21.7,21.0,35.6,34.3,17.5,6.8,4.8,114.1,100.17,97.39,1,1.0,1.0,0.0,0.0,23.357084676618957,13,15

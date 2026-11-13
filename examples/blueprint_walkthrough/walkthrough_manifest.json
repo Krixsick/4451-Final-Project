@@ -1,0 +1,92 @@
+{
+  "purpose": "Offline teaching example; never substituted for the league-wide experiment cohort",
+  "data_kind": "Actual NBA cached records; no invented observations",
+  "season": "2024-25",
+  "player_id": 1630567,
+  "player_name": "Scottie Barnes",
+  "player_rows": 14,
+  "clean_rows": 4,
+  "excluded_rows": 10,
+  "first_game_date": "2024-10-23",
+  "last_game_date": "2024-12-09",
+  "team_scope": "All league team logs from season start through the last demonstration appearance",
+  "snapshot_scope": "All cached team snapshots through the previous day of every included game date",
+  "expected_reference": "Exact subset of the official full-league 2024-25 prepared season export",
+  "files": {
+    "player_game_logs.csv": {
+      "sha256": "e6eb6727b37f0221c9d4330f7c5bdfcc547ae9ae2e35bba54b2e02a32a32289c",
+      "rows": 14
+    },
+    "team_game_logs.csv": {
+      "sha256": "aea256ceb2e22b611e5f79df25a949e58448d49661fee9cac910fa991e02ee9d",
+      "rows": 718
+    },
+    "birthdates.csv": {
+      "sha256": "d5f9d8212a12e5a7ad93feb6c2ca254ff95f424eef1b8751b4e543d9de2f4bd2",
+      "rows": 1
+    },
+    "team_snapshots.csv": {
+      "sha256": "c85d93b7f00fd6c4609df3ecf44f62424150539a00871b86381bfb3ff7307c3b",
+      "rows": 1348
+    },
+    "expected_clean_rows.csv": {
+      "sha256": "b842c434393f430414038dca2a8c639435316e7bc53aeedb4cb71307e51fc386",
+      "rows": 4
+    }
+  },
+  "source_cache_sha256": {
+    "2024-25/players.csv": "3de68a32f19535ee36dd998a69dc2fdd6ea26d4ead4c3cf7181036f29245849a",
+    "2024-25/teams.csv": "2b8a528a5ac840dda3f9a29db0d3eb2821cbaed8e4e8341018980c051e9ab1ce",
+    "profiles/1630567.csv": "528877e0e4878133fe7d46c6b98e5da4d953b8fcecdb19f20e91b51b94b72e14",
+    "2024-25/team_stats/2024-10-21.csv": "ce18566c7fe75ca75a2f9ad65fbd888c6dba47a6a2155daffcec3f25c4c74cae",
+    "2024-25/team_stats/2024-10-22.csv": "e264465aca186af2c9753dff84bf160c741aa1a41aa94a1a4527a077ff6357c1",
+    "2024-25/team_stats/2024-10-23.csv": "3a4bb79ece86a2e32d860365b4da5c9ad5d1ffa86e447b77dc556e292378fd86",
+    "2024-25/team_stats/2024-10-24.csv": "d7561d340a7f562a87136a893691b9f372ba934c8e0f2ed97a8c7e881a46b334",
+    "2024-25/team_stats/2024-10-25.csv": "c9e13f30b955bd57159fbd8327cea121fa09a0b0b56d0e02dd21f7253737e4dc",
+    "2024-25/team_stats/2024-10-26.csv": "b52035d4c25d4ef46eeff4e987da38875eb20b8c7b1ece65457bc695ac9c4c08",
+    "2024-25/team_stats/2024-10-27.csv": "524fca3628edb8c3805c3bf17c5e19aea414255ef327a1dc9dce68c726af5dea",
+    "2024-25/team_stats/2024-10-28.csv": "b848ff480053329a3fab2060dd90dd1c6a6c9e68c50132ac6f2713cb5897c948",
+    "2024-25/team_stats/2024-10-29.csv": "96981cd297d08d41f8b5eb70ad2a007cd9af144204c5b6514d0d603fbfd0d167",
+    "2024-25/team_stats/2024-10-30.csv": "1fadee9ff4f3cbe77be3d941fabc977b4a1ba56d672ae1aea0734e8bfc422941",
+    "2024-25/team_stats/2024-10-31.csv": "64bb7bf391081ed1319020de05ecef0a54a92b5b8c03274193199fbb1ab466b2",
+    "2024-25/team_stats/2024-11-01.csv": "3cef32c437b31c2f3d6e080db492c320931d7a65d42de810c37de49f98c01d03",
+    "2024-25/team_stats/2024-11-02.csv": "6053c3c9fb68ebc6e24377ffb89e5f9159c90d11c76a044482967eb3241555c1",
+    "2024-25/team_stats/2024-11-03.csv": "d59ec347752f017c78d921666d88960fd7ef28ac74429c866b36d56596ddf2c8",
+    "2024-25/team_stats/2024-11-05.csv": "59e67cdd16ac1c431908e9a5cfb1ee78a536656b12898300eec8dc4a8fe7e425",
+    "2024-25/team_stats/2024-11-06.csv": "311c66dd7f9c2f51b560f4d635e0baec5f8d5e6abd1046f1fc5f9d2918531633",
+    "2024-25/team_stats/2024-11-07.csv": "d25a57460c9a6b4ac87175df952c7b8b540e32a90e683bcaa2b22567a5ab1a7b",
+    "2024-25/team_stats/2024-11-08.csv": "d0fff8a15d0cc11b7bc0b80f0813cf83e196448efdd3b779ef5596b07931d05d",
+    "2024-25/team_stats/2024-11-09.csv": "61127d8b9b15667c0213b43d507f6a1440583e4cd0fe9f2ae90182e1463ff8c3",
+    "2024-25/team_stats/2024-11-10.csv": "386603d48abcc90985be3ba96a1c76efb642635d994a679421b789f812713905",
+    "2024-25/team_stats/2024-11-11.csv": "12b5a726ed26ad41f6d5e286789d464b6d732f3633ac0d2daa17cf7471ce19c0",
+    "2024-25/team_stats/2024-11-12.csv": "6b2d2fabe656761fa374aa36f0e9e4fe2335a4663ee21f2f5de22e64948660b3",
+    "2024-25/team_stats/2024-11-13.csv": "ffc62179d52a2d7ded33c670b5535d833553f6b5e9e2765c2acfd5bd282bbdad",
+    "2024-25/team_stats/2024-11-14.csv": "9490f374c20d3cca835e9a3211198bfdc597923dd5989211424c9452079c282b",
+    "2024-25/team_stats/2024-11-15.csv": "cb10898778f790e77e86dfbf8a020761f53ea1791f2c3e40c4a65ffd9d9dbd2a",
+    "2024-25/team_stats/2024-11-16.csv": "25ca781a3d4b45043c59687ed4c28718c688069bb03c332e4cdc9a913c79c184",
+    "2024-25/team_stats/2024-11-17.csv": "9b7052b35a2ec4e9c73ab3d6891618e3b46df48332e434e92d3b5e1dec3dd46e",
+    "2024-25/team_stats/2024-11-18.csv": "cb2c93407552fd4bb3a39e057efec0f8e82e14a9880be76e7eafef604e5a7364",
+    "2024-25/team_stats/2024-11-19.csv": "cbff736a91671da84c83314c1a8a3ef75a8b69ae7c4e792c60981f4d844ba1f0",
+    "2024-25/team_stats/2024-11-20.csv": "841ae3297c937bd21dd114e467452fe6cc9bdd08c4a50dea530d99336a717245",
+    "2024-25/team_stats/2024-11-21.csv": "a7d4c944012c65ceecab7df3dcf1d500565ff81082470929a95639fbe0507b87",
+    "2024-25/team_stats/2024-11-22.csv": "9df9294c358018d84d9f5f0c369554f717f09b831546812bf78a8d570b30bb97",
+    "2024-25/team_stats/2024-11-23.csv": "c29daabb452106aec03f4eebc117fca684e2954912a57bcd5d67cc3c423ef05f",
+    "2024-25/team_stats/2024-11-24.csv": "ad36147fa36ad035d668cfa0c02ea839f77f932d1ce44b1899c92727a97c7d32",
+    "2024-25/team_stats/2024-11-25.csv": "d6bc3662b341bb55d69273c18c0e31739371649a4317dc5f4e1b31f9430d727e",
+    "2024-25/team_stats/2024-11-26.csv": "284826fb6f7fcc25344f0a8614314123cf931fdc99578033e3bbbb55a680598d",
+    "2024-25/team_stats/2024-11-28.csv": "d3ab7116fe58bdb373f3f4f9d717006db76f33a92647d7eea09469a17d6ce51a",
+    "2024-25/team_stats/2024-11-29.csv": "b7fb8820d8b072da73a122ab8cf18e9fdac311c11f13267414f045c02b6371e7",
+    "2024-25/team_stats/2024-11-30.csv": "53ff4ca4971d1e52e5dca2f7739e5800cd8c33ac2cf7e062bd457ddbb9102f24",
+    "2024-25/team_stats/2024-12-01.csv": "66971e1a42f6118b3bd753da624e1f8a44b84d154218137c2e1450c6245f0474",
+    "2024-25/team_stats/2024-12-02.csv": "0dfa9dd2dfaba6277d3a305e29c4579619b84759b9b300dc2109de840f3abc30",
+    "2024-25/team_stats/2024-12-03.csv": "3329929ff32b7e789c4313d4bd582007b1235230bbc3757c2cd97cc150857575",
+    "2024-25/team_stats/2024-12-04.csv": "f18ec76f0339484571efe955b80f699e7a2a3dc9a3ab03cfa049b5bb403209df",
+    "2024-25/team_stats/2024-12-05.csv": "1cafd5ccc2d98251663c05b88a6aa98b93f7d0c63d4c6c9dffb7389c8439f979",
+    "2024-25/team_stats/2024-12-06.csv": "61b24eaaac296dc6751ac6e4ab8348a490ee591c9c6230f3503d5231194d5251",
+    "2024-25/team_stats/2024-12-07.csv": "fc7467cfc323b903070ebe475b236d7e40b666871353696bdec02a73aafb28fc",
+    "2024-25/team_stats/2024-12-08.csv": "81e4ba1893cb61bb7b1917477e7f05f6966fb46cb58119597d433d1657747f57"
+  },
+  "reference_season_sha256": "918662e08e898981b227d9643424a332ff2a6ad270872b125ec8f439e91ef53e",
+  "nba_downloads_performed": false,
+  "final_test_loaded": false
+}

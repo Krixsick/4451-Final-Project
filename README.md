@@ -1,155 +1,137 @@
-# 4451-Final-Project
+# NBA player-points forecasting — team Blueprint
 
-NBA player-points prediction case study. Prepare reproducible CSV datasets first;
-train and evaluate models separately, then serve the chosen model through FastAPI.
+This PR adds modeling and validation evaluation to the existing NBA preparation
+pipeline. One general model predicts points for eligible player appearances.
 
-## Where to start reading the code
+Start with [notebooks/NBA_Blueprint_Experiments.ipynb](notebooks/NBA_Blueprint_Experiments.ipynb).
+The English notebook explains collection, cleaning, all 18 pregame inputs,
+chronological splits, model/search definitions, results and inference. Read
+[reports/BLUEPRINT_VALIDATION_RESULTS.md](reports/BLUEPRINT_VALIDATION_RESULTS.md)
+for the recorded real-data findings.
 
-The pipeline is organized into three modules:
+## Setup and execution
 
-| File | Responsibility |
-| --- | --- |
-| `scripts/prepare_data.py` | Run the steps and export the CSVs |
-| `scripts/features.py` | Calculate player history, team rest, age, and opponent features |
-| `scripts/nba_source.py` | Request NBA data, cache responses, and retry failed downloads |
-
-Start with `prepare_season()` in `scripts/prepare_data.py`. It follows four steps:
-load records, calculate features, separate incomplete rows, and save CSVs.
-`add_player_history()` has one explicit assignment per rolling feature.
-Team context is broken into schedule calculations, historical ratings, and
-opponent matching. Download details live in their own module so you can learn
-the feature calculations without first reading request and cache handling.
-
-## Prepare the datasets
-
-From the project root, start with one player and one season:
+Use Python 3.13, pinned by `.python-version`, and run from the project root:
 
 ```sh
-uv run python -m scripts.prepare_data --season 2024-25 --player-id 2544
+uv sync --frozen --group dev
 ```
 
-The source downloads are cached under `data/dirty`. A small player sample is
-exported under `data/clean/samples/players_2544`, so it cannot overwrite the
-full-study files. Omit `--player-id` to include all players. No manual name-to-ID
-lookup is required: the league-wide player logs contain both.
+Select the project's `.venv` Python kernel in VS Code/Jupyter. The local-test ZIP
+supplies data, verified results and a frozen model, so Run All works offline.
+Its package-only `local_test/README.md` documents one-command verification.
 
-Build each study split:
+A Git-only checkout needs prepared input files first:
 
 ```sh
-uv run python -m scripts.prepare_data --split train
-uv run python -m scripts.prepare_data --split validation
-uv run python -m scripts.prepare_data --split test --refresh-logs
+uv run --frozen python -m scripts.blueprint prepare
+uv run --frozen python -m scripts.blueprint evaluate
 ```
 
-| Export | Seasons |
-| --- | --- |
-| `data/clean/train_2020_2025.csv` | 2020-21 through 2024-25 |
-| `data/clean/validation_2025_2026.csv` | 2025-26 |
-| `data/clean/test_2026_2027.csv` | Completed 2026-27 regular-season appearances available when downloaded |
+Preparation reuses the original NBA cache under `data/dirty`; add `--offline`
+only when that cache is complete. It writes training/validation data to
+`data/clean/blueprint_v1`, not the final test. Evaluation writes
+`artifacts/blueprint_v1/results`. Existing outputs are preserved; choose fresh
+output paths for an intentional new run. The notebook verifies and reuses saved
+results when present, otherwise runs the full search. It also reproduces the
+selected training-only fit.
 
-`--split all` prepares all three. Keep final-test outcomes out of feature and
-model selection. The ongoing test season is not a complete-season evaluation yet.
+## Official protocol
 
-The first download can be slow: two league-wide game-log requests per season,
-one profile per distinct player, and one league-wide advanced team snapshot per
-game date. Cached files allow interrupted runs to resume. Each request has a
-timeout, a bounded retry count, and spacing between requests. If NBA endpoints
-are unavailable, the command fails explicitly; it never invents replacement data.
+| Split | Exact seasons | Role |
+| --- | --- | --- |
+| Training | 2021-22, 2022-23, 2023-24, 2024-25 | Fit models and preprocessing |
+| Validation | 2025-26 | Select parameters and the candidate |
+| Reserved test | 2026-27 | Pending RQ3 |
 
-Other options:
+`scripts/experiment_config.py` defines periods, nested inputs, grids and rules.
+The unchanged legacy `prepare_data` CLI includes 2020-21 by default; use
+`scripts.blueprint` for the official four-season protocol. Do not mix scores
+from different training periods.
 
-- `--offline`: prepare CSVs using cached sources only.
-- `--refresh-logs`: refresh player and team logs as new games finish.
-- `--season 2025-26`: export that season without rebuilding combined splits.
-- `--player-id 2544 --player-id 201939`: process a selected sample.
-- `--data-dir /absolute/path`: override the data folder.
-- `--timeout 30 --attempts 2`: control network retries.
+Each row contains eight metadata fields, 18 numeric inputs and `target_points`.
+All variants retain the same upstream complete-case cohort and ten previous
+same-season appearances. Names/IDs are metadata. Histories exclude the current
+game, reset by season, continue across trades, and do not zero-fill absences.
+Advanced summaries stop before the game and verify GP against prior team games.
+Rest uses every team game, including games the selected player missed.
 
-Profiles and date-specific team snapshots stay cached. Refresh a corrected
-snapshot by removing its specific cache file deliberately. Preserve frozen raw
-data with the final experiment so the results remain reproducible.
+| Group | Input count | Addition |
+| --- | --- | --- |
+| F1 | 10 | Eight lagged player-stat fields, age and prior-appearance count |
+| F2 | 12 | Opponent defensive rating and opponent pace |
+| F3 | 18 | Own pace, home status, both rest intervals and both back-to-back flags |
 
-## CSV contents
+## Models and evaluation
 
-One row represents one player's appearance in one game. Metadata columns are
-`season`, `game_id`, `game_date`, `player_id`, `player_name`, `team_id`,
-`team_abbreviation`, and `opponent_id`. Names are retained for inspection and
-reporting; IDs are the stable join keys. Names and IDs are not model inputs.
+| ID | Procedure | Candidate configurations per group |
+| --- | --- | --- |
+| M0 | Previous-ten-game or season-to-date scoring mean | Two reference rules |
+| M1 | StandardScaler then Ridge | Five alpha values |
+| M2 | Random Forest, 150 trees | Four depth/minimum-leaf pairs |
+| M3 | Actual XGBoost CPU histogram regressor, 300 trees | Four depth/L2 pairs |
 
-The 18 numeric input columns are defined in `scripts/features.py`:
+There are 39 ML candidate fits across three groups. Scaling and fitting use
+training only. Validation MAE selects parameters; RMSE is secondary. There is
+no validation refit or early stopping. Seeds/grids are fixed before results.
+Within-grid ties retain candidate order; overall ties prefer fewer inputs then
+model/group/variant order.
 
-| Group | Columns |
-| --- | --- |
-| Scoring | points_last_5, points_last_10, points_season_avg |
-| Minutes | minutes_last_5, minutes_last_10 |
-| Attempts | fga_last_10, fg3a_last_10, fta_last_10 |
-| Opponent defense | opponent_defensive_rating |
-| Pace | team_pace, opponent_pace |
-| Schedule | is_home, team_rest_days, opponent_rest_days, team_back_to_back, opponent_back_to_back |
-| Background | age, games_played_before |
+RQ1 compares the selected M0 and M1/M2/M3 on F3. RQ2 evaluates all nine ML/group
+combinations on identical rows; each is independently tuned. RQ3 remains pending.
+The recorded candidate is Ridge F1, alpha 100: validation MAE 4.657306 versus
+4.716219 for the ten-game mean. These development scores are not final-test claims.
 
-`target_points` is the observed outcome, stored separately from the input list.
-
-```python
-import pandas as pd
-from scripts.features import FEATURE_COLUMNS
-
-training = pd.read_csv(
-    "data/clean/train_2020_2025.csv", dtype={"game_id": "string"}
-)
-X_train = training[FEATURE_COLUMNS]
-y_train = training["target_points"]
-names_for_reporting = training["player_name"]
-```
-
-Use the explicit input list rather than automatically feeding every CSV column
-into a model. Fit any scaler, imputer, or other learned preprocessing on training
-data only. These CSVs are not scaled and are not used to train anything by the
-preparation command.
-
-## Cleaning and historical cutoffs
-
-- Historical games are sorted before calculations. Rolling averages and season
-  averages exclude the current appearance with `shift(1)`.
-- Histories reset at a season boundary but remain continuous across a trade.
-  This initial version does not use a prior-season fallback.
-- A ten-game average requires ten earlier appearances. An absence is not entered
-  as a zero-point game. The study is conditional on the player making an appearance.
-- Complete rows go to the clean CSVs. Rows missing any input go to
-  `data/clean/excluded/excluded_<season>.csv` with `missing_columns`. No missing
-  value is silently turned into zero. This policy excludes early-season and
-  low-history appearances; document that population in the study results.
-- The proposed 70% attendance rule is not applied. It needs a separate prior-season
-  eligibility decision and must not use the eventual attendance of a test season.
-- Rest uses every team game, including games a selected player missed. Rest means
-  full calendar days between games: consecutive dates mean 0 rest and a back-to-back.
-  First-game rest is unknown because these logs contain regular-season games only.
-- Opponent rating and both pace values are NBA-returned advanced statistics with
-  `DateTo` set to the previous calendar day. The pipeline checks the returned GP
-  against the number of earlier team games to detect a missing/ignored cutoff.
-- First-game team ratings stay missing. Team identity comes from the historical
-  game, not today's roster. Age is fractional years since birth on the game date.
-- Duplicate player-game records, missing names, missing birthdates, invalid
-  historical statistics, inconsistent team-game joins, and infinite values fail
-  explicitly. No duplicate is arbitrarily chosen or averaged away.
-- Each run writes a JSON report with split membership, feature names, source/clean
-  row counts, exclusions, and last game date. This date identifies the extent of
-  an in-progress season, not a guarantee that a full season was returned.
-
-## Tests
+## Export and target-free prediction
 
 ```sh
-uv run python -m unittest discover -s tests -v
+uv run --frozen python -m scripts.blueprint_artifact
+uv run --frozen python -m scripts.predict --model-dir artifacts/blueprint_v1/frozen_model --input prepared_pregame.csv --output predictions.csv
 ```
 
-Tests use clearly invented records and mocked requests. They cover rolling
-arithmetic, future-data exclusion, trades, team rest across player absences,
-Unicode names, leading-zero game IDs, validation/test separation, cache reuse,
-cutoff verification, and excluded-row reports. They do not establish NBA server
-availability. Never use the synthetic fixtures as study data.
+Export verifies the recorded selection, data/report hashes, training-only fit,
+validation reproduction and reload. Every declared winner is supported. XGBoost
+uses native JSON, Ridge/Random Forest trusted joblib, and M0 a JSON rule.
+Inference requires the selected pregame features, not the target. Headers map by
+name; optional metadata and row order are preserved. No imputation, rounding or
+clipping is applied. Load only trusted team artifacts with the locked environment.
 
-## Source documentation
+The CLI does not implement availability prediction, automatic upcoming-game
+feature assembly or FastAPI serving. The existing main.py is a placeholder.
 
-- [Player and team game logs](https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguegamelog.md)
-- [Advanced team statistics and date filters](https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguedashteamstats.md)
-- [Player birthdates](https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/commonplayerinfo.md)
+## Tests and files
+
+```sh
+uv run --frozen --group dev python -m unittest discover -s tests -v
+```
+
+The focused suite preserves the teammate's rolling-history tests and checks
+official contracts, leakage/snapshot boundaries, all-family serialization,
+inference and notebook execution. Synthetic experiments use invented records
+and a mocked NBA source. Notebook tests isolate data/results/model paths from
+packaged real artifacts and select the current test process's Python kernel.
+
+`examples/blueprint_walkthrough` is a separate actual NBA teaching subset:
+Barnes's first 14 appearances in 2024-25, complete team history through the cutoff
+and prior-day summaries. It reconstructs four eligible rows matching the official
+season export. It is not the experiment training or validation cohort.
+
+| Location | Role |
+| --- | --- |
+| scripts/nba_source.py, features.py, prepare_data.py | Unchanged collection/preparation |
+| scripts/experiment_config.py, blueprint.py | Official protocol and experiment |
+| scripts/modeling.py, blueprint_report.py | Contracts, scoring and figures |
+| scripts/blueprint_artifact.py, model_artifact.py, predict.py | Export and inference |
+| notebooks/NBA_Blueprint_Experiments.ipynb | Output-free official notebook |
+| tests/, reports/ | Focused verification, scope and findings |
+
+Generated `data/`, `artifacts/`, and package-only `local_test/` are ignored by Git.
+The local-test ZIP supplies their required inputs/evidence separately. Earlier
+exploratory work is outside this focused PR and remains preserved separately.
+Branch from development, review the feature PR into development, and promote to
+main after stable team integration. The individual-download NBA_Main.ipynb is a
+separate distribution, not the shared repository entrypoint.
+
+Final RQ3, the IEEE report and serving application remain unfinished milestones.
+Document appearance conditioning, warm-up exclusions, complete-case coverage,
+retrospective sources and validation-selection optimism in the report.
