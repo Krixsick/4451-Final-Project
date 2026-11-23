@@ -42,7 +42,7 @@ selected training-only fit.
 | --- | --- | --- |
 | Training | 2021-22, 2022-23, 2023-24, 2024-25 | Fit models and preprocessing |
 | Validation | 2025-26 | Select parameters and the candidate |
-| Reserved test | 2026-27 | Pending RQ3 |
+| Held-out test | 2026-27 through November 22, 2026 | RQ3 generalization |
 
 `scripts/experiment_config.py` defines periods, nested inputs, grids and rules.
 The unchanged legacy `prepare_data` CLI includes 2020-21 by default; use
@@ -78,9 +78,13 @@ Within-grid ties retain candidate order; overall ties prefer fewer inputs then
 model/group/variant order.
 
 RQ1 compares the selected M0 and M1/M2/M3 on F3. RQ2 evaluates all nine ML/group
-combinations on identical rows; each is independently tuned. RQ3 remains pending.
+combinations on identical rows; each is independently tuned.
 The recorded candidate is Ridge F1, alpha 100: validation MAE 4.657306 versus
 4.716219 for the ten-game mean. These development scores are not final-test claims.
+
+RQ3 evaluated the locked Ridge F1 procedure on 1,496 eligible 2026–27 appearances
+through November 22. Test MAE was 4.875480 points for Ridge and 4.922393 for the
+ten-game mean. See the [RQ3 results and reproduction commands](reports/RQ3_RESULTS.md).
 
 ## Export and target-free prediction
 
@@ -132,6 +136,6 @@ Branch from development, review the feature PR into development, and promote to
 main after stable team integration. The individual-download NBA_Main.ipynb is a
 separate distribution, not the shared repository entrypoint.
 
-Final RQ3, the IEEE report and serving application remain unfinished milestones.
+The IEEE report and serving application remain unfinished milestones.
 Document appearance conditioning, warm-up exclusions, complete-case coverage,
 retrospective sources and validation-selection optimism in the report.

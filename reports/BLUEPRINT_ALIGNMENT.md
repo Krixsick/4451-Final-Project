@@ -1,5 +1,7 @@
 # Official Blueprint PR scope and alignment
 
+This table records the validation-stage PR. The subsequent [RQ3 results](RQ3_RESULTS.md) cover the held-out 2026–27 window through November 22.
+
 This change adds the official modeling/evaluation layer to the existing team
 repository. The upstream nba_source.py, features.py, prepare_data.py and the
 teammate's test_leakage.py are retained unchanged.
