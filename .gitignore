@@ -11,4 +11,8 @@ wheels/
 AGENTS.md
 docs/
 data/
-tests/
+# Modeling runs and notebook editor state
+artifacts/
+.ipynb_checkpoints/
+# Local verification package and execution evidence
+local_test/
